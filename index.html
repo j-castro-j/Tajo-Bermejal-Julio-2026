@@ -10,47 +10,25 @@
 
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body, #cesiumContainer {
-      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #121519; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    .top-bar {
-      position: absolute; top: 16px; left: 16px; z-index: 10;
-      background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px);
-      padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #f0f3f6; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    }
-    .top-bar h1 {
-      margin: 0 6px 0 0; font-size: 14px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #58a6ff; white-space: nowrap;
-    }
-    .nav-btn {
-      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e6edf3; padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-      white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;
-    }
+    html, body, #cesiumContainer { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: #121519; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    .top-bar { position: absolute; top: 16px; left: 16px; z-index: 10; background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); color: #f0f3f6; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+    .top-bar h1 { margin: 0 6px 0 0; font-size: 14px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #58a6ff; white-space: nowrap; }
+    .nav-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #e6edf3; padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
     .nav-btn:hover { background: #1f6feb; border-color: #58a6ff; }
     .nav-btn.active-measure { background: #238636; border-color: #2ea043; color: #fff; }
     .nav-btn.active-slope { background: #d29922; border-color: #e3b341; color: #000; font-weight: 700; }
     .nav-btn.active-plane { background: #8957e5; border-color: #a371f7; color: #fff; font-weight: 700; }
-    
     .nav-btn-export { background: rgba(35, 134, 54, 0.25); border-color: #2ea043; color: #7ee787; }
     .nav-btn-export:hover { background: #238636; color: #fff; }
     .nav-btn-camera { background: rgba(88, 166, 255, 0.18); border-color: #58a6ff; color: #58a6ff; }
     .nav-btn-camera:hover { background: #1f6feb; color: #fff; }
 
-    .compass-card {
-      position: absolute; top: 16px; right: 16px; z-index: 10;
-      width: 110px; height: 110px; background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px);
-      border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.18); display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.5); transition: border-color 0.2s, transform 0.15s;
-    }
+    .compass-card { position: absolute; top: 16px; right: 16px; z-index: 10; width: 110px; height: 110px; background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px); border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.18); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.5); transition: border-color 0.2s, transform 0.15s; }
     .compass-card:hover { border-color: #58a6ff; transform: scale(1.04); }
     .compass-svg { width: 75px; height: 75px; transform-origin: 50% 50%; will-change: transform; }
 
-    .info-panel {
-      position: absolute; top: 72px; left: 16px; z-index: 10;
-      background: rgba(18, 21, 25, 0.95); backdrop-filter: blur(8px);
-      padding: 14px 18px; border-radius: 8px; font-size: 12px; display: none; min-width: 240px; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    }
+    .info-panel { position: absolute; top: 72px; left: 16px; z-index: 10; background: rgba(18, 21, 25, 0.95); backdrop-filter: blur(8px); padding: 14px 18px; border-radius: 8px; font-size: 12px; display: none; min-width: 240px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
     .panel-measure { border: 1px solid #58a6ff; }
     .panel-slope { border: 1px solid #d29922; }
     .panel-plane { border: 1px solid #a371f7; }
@@ -58,32 +36,23 @@
     .panel-measure h2 { color: #58a6ff; }
     .panel-slope h2 { color: #e3b341; }
     .panel-plane h2 { color: #c084fc; }
-    
     .metric-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: #e6edf3; }
     .metric-val { font-weight: bold; font-family: monospace; }
     .val-measure { color: #7ee787; }
     .val-slope { color: #f0883e; }
     .val-plane { color: #d8b4fe; }
 
-    .coords-card {
-      position: absolute; bottom: 20px; left: 16px; z-index: 10;
-      background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px);
-      padding: 10px 16px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #c9d1d9; font-size: 12px; font-family: "SFMono-Regular", Consolas, monospace;
-      display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    .system-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #58a6ff; background: rgba(88, 166, 255, 0.12); border: 1px solid rgba(88, 166, 255, 0.25); padding: 2px 6px; border-radius: 3px; align-self: flex-start; }
+    .coords-card { position: absolute; bottom: 20px; left: 16px; z-index: 10; background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px); padding: 10px 16px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.12); color: #c9d1d9; font-size: 12px; font-family: "SFMono-Regular", Consolas, monospace; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    
+    /* CAMBIO CONCEPTUAL 3: Etiquetas para proteger la validez de la cota */
+    .tags-container { display: flex; gap: 8px; align-items: center; }
+    .system-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #58a6ff; background: rgba(88, 166, 255, 0.12); border: 1px solid rgba(88, 166, 255, 0.25); padding: 2px 6px; border-radius: 3px; }
+    .source-tag { font-size: 9px; font-weight: 600; letter-spacing: 0.5px; color: #8b949e; text-transform: uppercase; }
+    
     .coords-row { display: flex; gap: 18px; }
     .coord-item span { color: #7ee787; font-weight: bold; }
 
-    #loadingBar {
-      position: absolute; bottom: 30px; right: 20px; z-index: 100;
-      background: rgba(31, 111, 235, 0.85); border: 1px solid #58a6ff;
-      color: white; padding: 10px 20px; border-radius: 20px;
-      font-size: 13px; font-weight: 600; display: none;
-      backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      pointer-events: none; transition: opacity 0.3s;
-    }
+    #loadingBar { position: absolute; bottom: 30px; right: 20px; z-index: 100; background: rgba(31, 111, 235, 0.85); border: 1px solid #58a6ff; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; display: none; backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; transition: opacity 0.3s; }
 
     @media (max-width: 768px) {
       .top-bar { top: 10px; left: 10px; right: 10px; padding: 8px 10px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
@@ -93,6 +62,7 @@
       .compass-svg { width: 50px; height: 50px; }
       .coords-card { bottom: 10px; left: 10px; right: 10px; padding: 8px 12px; font-size: 11px; }
       .coords-row { gap: 8px; justify-content: space-between; }
+      .tags-container { flex-direction: column; align-items: flex-start; gap: 3px; }
       .info-panel { top: 68px; left: 10px; right: 10px; min-width: unset; font-size: 13px; }
       #loadingBar { bottom: 100px; right: 50%; transform: translateX(50%); white-space: nowrap; }
     }
@@ -106,13 +76,11 @@
     <button class="nav-btn" onclick="perspectiveView()">Perspectiva 3D</button>
     <button class="nav-btn" id="measureBtn" onclick="toggleMode('measure')">📏 Medir</button>
     <button class="nav-btn" id="slopeBtn" onclick="toggleMode('slope')">📐 Cresta-Pie</button>
-    <!-- NUEVA HERRAMIENTA GEOMECÁNICA -->
     <button class="nav-btn" id="planeBtn" onclick="toggleMode('plane')">▰ Plano Estructural</button>
-    
     <button class="nav-btn nav-btn-camera" onclick="takeExecutiveScreenshot()">📸 Captura</button>
     <button class="nav-btn nav-btn-export" id="exportBtn" onclick="exportToCSV()">📥 CSV (<span id="recCount">0</span>)</button>
     <button class="nav-btn" id="clearBtn" style="display: none;" onclick="clearActiveMeasurement()">Borrar</button>
-    <button class="nav-btn" id="resetStorageBtn" onclick="clearAllHistory()" title="Borra el registro acumulado">Limpiar Historial</button>
+    <button class="nav-btn" id="resetStorageBtn" onclick="clearAllHistory()" title="Borra el registro acumulado">Limpiar</button>
   </div>
 
   <div class="compass-card" id="compassBtn" title="Clic para orientar al Norte" onclick="orientToNorth()">
@@ -141,7 +109,6 @@
     <div class="metric-row"><span>Dist. Real:</span><span class="metric-val val-slope" id="tDist3D">-- m</span></div>
   </div>
 
-  <!-- PANEL PARA EL PLANO ESTRUCTURAL -->
   <div class="info-panel panel-plane" id="panelPlane">
     <h2>Plano Estructural (3 Puntos)</h2>
     <div class="metric-row"><span>Rumbo (Strike):</span><span class="metric-val val-plane" id="pStrike">-- °</span></div>
@@ -151,7 +118,11 @@
   </div>
 
   <div class="coords-card" id="coordsCard">
-    <div class="system-tag" id="zoneTag">SISTEMA LOCAL DE MINA</div>
+    <div class="tags-container">
+      <div class="system-tag" id="zoneTag">SISTEMA LOCAL DE MINA</div>
+      <!-- DISCLAIMER AÑADIDO (Punto 3) -->
+      <div class="source-tag">FUENTE COTA: SUPERFICIE 3D VISIBLE (DSM)</div>
+    </div>
     <div class="coords-row">
       <div class="coord-item">Este (X): <span id="localX">--</span> m</div>
       <div class="coord-item">Norte (Y): <span id="localY">--</span> m</div>
@@ -212,8 +183,18 @@
     function topView() { if (currentTileset) viewer.zoomTo(currentTileset, new Cesium.HeadingPitchRange(0, Cesium.Math.toRadians(-89.9), 0)); }
     function perspectiveView() { if (currentTileset) viewer.zoomTo(currentTileset, new Cesium.HeadingPitchRange(Cesium.Math.toRadians(45), Cesium.Math.toRadians(-35), 0)); }
 
+    // OPTIMIZACIÓN 1: Actualización Inteligente del DOM (Evitar Renderizado innecesario)
     const needle = document.getElementById('compassNeedle');
-    viewer.scene.postRender.addEventListener(function() { needle.style.transform = `rotate(${-Cesium.Math.toDegrees(viewer.camera.heading)}deg)`; });
+    let lastHeading = null;
+    viewer.scene.postRender.addEventListener(function() { 
+      const currentHeading = viewer.camera.heading;
+      // Solo modifica el HTML si la cámara rotó más de 0.005 radianes (aprox 0.28 grados)
+      if (lastHeading === null || Math.abs(lastHeading - currentHeading) > 0.005) {
+        needle.style.transform = `rotate(${-Cesium.Math.toDegrees(currentHeading)}deg)`; 
+        lastHeading = currentHeading;
+      }
+    });
+
     function orientToNorth() { viewer.camera.flyTo({ destination: viewer.camera.position, orientation: { heading: 0.0, pitch: viewer.camera.pitch, roll: 0.0 }, duration: 0.7 }); }
 
     // =========================================================================
@@ -247,7 +228,16 @@
     }
 
     const coordsHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    
+    // OPTIMIZACIÓN 2: Throttling del MOUSE_MOVE (Resuelve el Cuello de Botella)
+    let lastMouseMoveTime = 0;
+    
     coordsHandler.setInputAction(function(movement) {
+      const now = Date.now();
+      // Solo calcular intersección de terreno una vez cada 50ms (máx. 20 FPS para coordenadas)
+      if (now - lastMouseMoveTime < 50) return; 
+      lastMouseMoveTime = now;
+
       const pickedPosition = viewer.scene.pickPosition(movement.endPosition);
       if (Cesium.defined(pickedPosition)) {
         const cartographic = Cesium.Cartographic.fromCartesian(pickedPosition);
@@ -317,16 +307,11 @@
           const p1 = toolPoints[0]; const p2 = toolPoints[1];
           toolEntities.push(viewer.entities.add({ polyline: { positions: [p1, p2], width: 4, material: Cesium.Color.fromCssColorString(lColor), depthFailMaterial: Cesium.Color.fromCssColorString(lColor) } }));
 
-          // CÁLCULOS 100% SOBRE COORDENADAS LOCALES (Integridad Topográfica)
           const p1L = getMinePlanCoordinates(Cesium.Cartographic.fromCartesian(p1), activeZone);
           const p2L = getMinePlanCoordinates(Cesium.Cartographic.fromCartesian(p2), activeZone);
           
-          const dE = p2L.rawE - p1L.rawE;
-          const dN = p2L.rawN - p1L.rawN;
-          const deltaZ = p2L.rawZ - p1L.rawZ;
-          
-          const distH = Math.sqrt(dE*dE + dN*dN);
-          const dist3D = Math.sqrt(distH*distH + deltaZ*deltaZ);
+          const dE = p2L.rawE - p1L.rawE; const dN = p2L.rawN - p1L.rawN; const deltaZ = p2L.rawZ - p1L.rawZ;
+          const distH = Math.sqrt(dE*dE + dN*dN); const dist3D = Math.sqrt(distH*distH + deltaZ*deltaZ);
           
           let record = {
             timestamp: new Date().toISOString().replace('T',' ').slice(0, 19), zone: activeZone.nombre, type: currentMode === 'slope' ? "CRESTA_PIE" : "MEDICION_3D",
@@ -354,7 +339,6 @@
           viewer.canvas.style.cursor = 'default'; currentMode = null;
         }
       } 
-      // MODO PLANO ESTRUCTURAL (3 PUNTOS)
       else if (currentMode === 'plane') {
         if (toolPoints.length === 1) pBtn.innerText = 'P2: Segundo Clic';
         else if (toolPoints.length === 2) {
@@ -364,35 +348,26 @@
         else if (toolPoints.length === 3) {
           const p1 = toolPoints[0]; const p2 = toolPoints[1]; const p3 = toolPoints[2];
           
-          // Dibujar Polígono traslúcido
           toolEntities.push(viewer.entities.add({
             polygon: { hierarchy: new Cesium.PolygonHierarchy([p1, p2, p3]), material: Cesium.Color.fromCssColorString('#a371f7').withAlpha(0.3), perPositionHeight: true, outline: true, outlineColor: Cesium.Color.fromCssColorString('#d8b4fe') }
           }));
 
-          // Obtener coordenadas MinePlan
           const p1L = getMinePlanCoordinates(Cesium.Cartographic.fromCartesian(p1), activeZone);
           const p2L = getMinePlanCoordinates(Cesium.Cartographic.fromCartesian(p2), activeZone);
           const p3L = getMinePlanCoordinates(Cesium.Cartographic.fromCartesian(p3), activeZone);
 
-          // Vectores en topografía local
           const uE = p2L.rawE - p1L.rawE; const uN = p2L.rawN - p1L.rawN; const uZ = p2L.rawZ - p1L.rawZ;
           const vE = p3L.rawE - p1L.rawE; const vN = p3L.rawN - p1L.rawN; const vZ = p3L.rawZ - p1L.rawZ;
 
-          // Producto Cruz (Vector Normal)
-          let nE = uN * vZ - uZ * vN;
-          let nN = uZ * vE - uE * vZ;
-          let nZ = uE * vN - uN * vE;
-
-          // Estandarizar normal apuntando hacia arriba para geometría de talud
+          let nE = uN * vZ - uZ * vN; let nN = uZ * vE - uE * vZ; let nZ = uE * vN - uN * vE;
           if (nZ < 0) { nE = -nE; nN = -nN; nZ = -nZ; }
 
           const magnitude = Math.sqrt(nE*nE + nN*nN + nZ*nZ);
           
-          // Cálculos Geológicos
           let dip = Cesium.Math.toDegrees(Math.acos(nZ / magnitude));
           let dipDir = Cesium.Math.toDegrees(Math.atan2(nE, nN));
           if (dipDir < 0) dipDir += 360;
-          let strike = (dipDir + 270) % 360; // Regla de la mano derecha
+          let strike = (dipDir + 270) % 360;
           let area = 0.5 * magnitude;
 
           let record = {
@@ -437,24 +412,21 @@
 
     function exportToCSV() {
       const list = getHistory(); if (list.length === 0) { alert("No hay mediciones registradas aún."); return; }
-      
       const headers = [
         "ID", "Fecha_Hora", "Zona", "Tipo_Analisis",
         "P1_Este_X", "P1_Norte_Y", "P1_Cota_Z", "P2_Este_X", "P2_Norte_Y", "P2_Cota_Z", "P3_Este_X", "P3_Norte_Y", "P3_Cota_Z",
         "Distancia_3D_m", "Distancia_Horiz_m", "Desnivel_DeltaZ_m", "Area_Analizada_m2",
         "Pendiente_Pct", "Inclinacion_Dip_Deg", "Dir_Descenso_Azimut_Deg", "Rumbo_Strike_Deg"
       ];
-      
       const rows = list.map((item, idx) => [
         idx + 1, `"${item.timestamp}"`, `"${item.zone}"`, `"${item.type}"`,
         item.p1_e, item.p1_n, item.p1_z, item.p2_e, item.p2_n, item.p2_z, item.p3_e, item.p3_n, item.p3_z,
         item.dist3D, item.distH, item.deltaZ, item.area, item.slope, item.dip, item.azimuth, item.strike
       ]);
-      
       const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\r\n");
       const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob); const link = document.createElement("a");
-      link.setAttribute("href", url); link.setAttribute("download", `Analisis_Estructural_${ZONA_ACTIVA}.csv`);
+      link.setAttribute("href", url); link.setAttribute("download", `Mediciones_${ZONA_ACTIVA}_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
   </script>
