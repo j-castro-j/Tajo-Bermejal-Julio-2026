@@ -36,15 +36,14 @@
     .nav-btn-export:hover { background: #238636; color: #fff; }
     .nav-btn-camera { background: rgba(88, 166, 255, 0.18); border-color: #58a6ff; color: #58a6ff; }
     .nav-btn-camera:hover { background: #1f6feb; color: #fff; }
+    .nav-btn-pin { background: rgba(248, 81, 73, 0.15); border-color: #f85149; color: #ff7b72; font-weight: 700; }
+    .nav-btn-pin:hover { background: #f85149; color: #fff; }
 
     .compass-card {
       position: absolute; top: 16px; right: 16px; z-index: 10;
-      width: 110px; height: 110px;
-      background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px);
-      border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.18);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-      transition: border-color 0.2s, transform 0.15s;
+      width: 110px; height: 110px; background: rgba(18, 21, 25, 0.90); backdrop-filter: blur(8px);
+      border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.18); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.5); transition: border-color 0.2s, transform 0.15s;
     }
     .compass-card:hover { border-color: #58a6ff; transform: scale(1.04); }
     .compass-svg { width: 75px; height: 75px; transform-origin: 50% 50%; will-change: transform; }
@@ -66,8 +65,7 @@
 
     #panelSection {
       display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 230px;
-      background: rgba(18, 21, 25, 0.95); backdrop-filter: blur(10px);
-      border-top: 2px solid #a371f7; padding: 10px 18px; z-index: 20; box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+      background: rgba(18, 21, 25, 0.95); backdrop-filter: blur(10px); border-top: 2px solid #a371f7; padding: 10px 18px; z-index: 20; box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
     }
     .sec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 12px; }
     .sec-title { font-weight: 700; color: #a371f7; letter-spacing: 0.5px; }
@@ -88,6 +86,16 @@
     .coords-row { display: flex; gap: 18px; }
     .coord-item span { color: #7ee787; font-weight: bold; }
 
+    /* Barra de Carga Dinámica */
+    #loadingBar {
+      position: absolute; bottom: 30px; right: 20px; z-index: 100;
+      background: rgba(31, 111, 235, 0.85); border: 1px solid #58a6ff;
+      color: white; padding: 10px 20px; border-radius: 20px;
+      font-size: 13px; font-weight: 600; display: none;
+      backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      pointer-events: none; transition: opacity 0.3s;
+    }
+
     @media (max-width: 768px) {
       .top-bar { top: 10px; left: 10px; right: 10px; padding: 8px 10px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
       .top-bar h1 { font-size: 13px; padding-right: 4px; }
@@ -99,6 +107,7 @@
       .info-panel { top: 68px; left: 10px; right: 10px; min-width: unset; font-size: 13px; }
       #panelSection { height: 210px; padding: 6px 10px; }
       .chart-box { height: 160px; }
+      #loadingBar { bottom: 100px; right: 50%; transform: translateX(50%); white-space: nowrap; }
     }
   </style>
 </head>
@@ -111,6 +120,9 @@
     <button class="nav-btn" id="measureBtn" onclick="toggleMode('measure')">📏 Medir</button>
     <button class="nav-btn" id="slopeBtn" onclick="toggleMode('slope')">📐 Talud</button>
     <button class="nav-btn" id="sectionBtn" onclick="toggleMode('section')">✂ Sección</button>
+    <!-- Botón Validador de Control -->
+    <button class="nav-btn nav-btn-pin" onclick="irAlPuntoControl()">📍 Validar Control</button>
+    
     <button class="nav-btn nav-btn-camera" onclick="takeExecutiveScreenshot()">📸 Captura</button>
     <button class="nav-btn nav-btn-export" id="exportBtn" onclick="exportToCSV()">📥 CSV (<span id="recCount">0</span>)</button>
     <button class="nav-btn" id="clearBtn" style="display: none;" onclick="clearActiveMeasurement()">Borrar Línea</button>
@@ -147,15 +159,11 @@
     <div class="sec-header">
       <div class="sec-title">PERFIL TRANSVERSAL DE TERRENO</div>
       <div class="sec-meta">
-        Longitud: <b id="secLength">0.0 m</b> &nbsp;|&nbsp; 
-        Muestras: <b id="secSamples">0</b> &nbsp;|&nbsp; 
-        ΔZ: <b id="secDeltaZ">0.0 m</b>
+        Longitud: <b id="secLength">0.0 m</b> &nbsp;|&nbsp; Muestras: <b id="secSamples">0</b> &nbsp;|&nbsp; ΔZ: <b id="secDeltaZ">0.0 m</b>
       </div>
       <button class="sec-close" onclick="closeSectionPanel()">✕</button>
     </div>
-    <div class="chart-box">
-      <canvas id="sectionChartCanvas"></canvas>
-    </div>
+    <div class="chart-box"><canvas id="sectionChartCanvas"></canvas></div>
   </div>
 
   <div class="coords-card" id="coordsCard">
@@ -166,6 +174,9 @@
       <div class="coord-item">Cota Z: <span id="localZ">--</span> m</div>
     </div>
   </div>
+
+  <!-- Contenedor del Loading Bar -->
+  <div id="loadingBar">⏳ Cargando nivel de detalle...</div>
 
   <div id="cesiumContainer"></div>
 
@@ -179,7 +190,7 @@
     const CONFIG_ZONAS = {
       "BERMEJAL_GUADALUPE": {
         nombre: "TAJO BERMEJAL - GUADALUPE",
-        assetId: 5179943, // <--- RECUERDA PONER TU ASSET ID
+        assetId: 5179943, // <--- PONER TU ASSET ID
         lat0: 17.8579401103632, lon0: -99.6739536626923,
         offset: [428637.51373973046, 1974398.0838580697, 3.8437755266563727],
         rvec: [0.00011132995333956913, -0.00003292231694213758, -0.00043669032632740194],
@@ -187,7 +198,7 @@
       },
       "FILOS": {
         nombre: "TAJO LOS FILOS",
-        assetId: 0000000, // <--- RECUERDA PONER TU ASSET ID
+        assetId: 0000000, // <--- PONER TU ASSET ID
         lat0: 17.8579401103632, lon0: -99.6739536626923,
         offset: [428637.51373973046, 1974398.0838580697, 3.8437755266563727],
         rvec: [0.00011132995333956913, -0.00003292231694213758, -0.00043669032632740194],
@@ -195,7 +206,7 @@
       },
       "PADS": {
         nombre: "PADS DE LIXIVIACIÓN",
-        assetId: 0000000, // <--- RECUERDA PONER TU ASSET ID
+        assetId: 0000000, // <--- PONER TU ASSET ID
         lat0: 17.8641030711538, lon0: -99.6942028892308,
         offset: [426491.06053362874, 1975081.382389519, 3.8771747150963165],
         rvec: [0.00009673884755205756, 0.0000010868499923518604, -0.0005409057326296537],
@@ -228,6 +239,20 @@
       currentTileset = tileset;
       viewer.scene.primitives.add(tileset);
       perspectiveView();
+
+      // =====================================================================
+      // BARRA DE CARGA INTELIGENTE (Detecta carga de bloques 3D)
+      // =====================================================================
+      tileset.loadProgress.addEventListener(function(pendingRequests, processingTiles) {
+        const loader = document.getElementById('loadingBar');
+        if (pendingRequests > 0 || processingTiles > 0) {
+          loader.style.display = 'block';
+          loader.innerText = `⏳ Refinando detalles... (${pendingRequests} bloques)`;
+        } else {
+          loader.style.display = 'none';
+        }
+      });
+
     });
 
     function topView() {
@@ -309,7 +334,69 @@
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
     // =========================================================================
-    // 3. GESTOR DE HISTORIAL PERSISTENTE (LOCALSTORAGE)
+    // 3. SOLVER INVERSO: COLOCACIÓN DEL PIN DE CONTROL DE CALIDAD
+    // =========================================================================
+    function irAlPuntoControl() {
+      // Coordenadas que solicitaste revisar
+      const targetE = 428816.73;
+      const targetN = 1974424.81;
+      const targetZ = 1722.90;
+
+      // Usamos el origen como punto de partida para el cálculo iterativo
+      let lat = activeZone.lat0;
+      let lon = activeZone.lon0;
+      let alt = targetZ;
+
+      // Newton-Raphson básico: Buscará las coordenadas Lat/Lon exactas 
+      // que produzcan las coordenadas locales (E, N) en un ciclo súper rápido
+      for (let i = 0; i < 25; i++) {
+        let cur = getMinePlanCoordinates(Cesium.Cartographic.fromDegrees(lon, lat, alt), activeZone);
+        let errE = targetE - cur.rawE;
+        let errN = targetN - cur.rawN;
+        let errZ = targetZ - cur.rawZ;
+
+        // Si el error es menor a 1 centímetro, terminamos la búsqueda
+        if (Math.abs(errE) < 0.01 && Math.abs(errN) < 0.01) break;
+
+        // 1 grado = aprox 111,111 metros en el Ecuador. Ajustamos proporciones.
+        lat += errN / 111111.0;
+        lon += errE / (111111.0 * Math.cos(Cesium.Math.toRadians(lat)));
+        alt += errZ; 
+      }
+
+      const pointCartesian = Cesium.Cartesian3.fromDegrees(lon, lat, alt);
+
+      // Limpiamos pines anteriores si se presionó varias veces
+      viewer.entities.values.filter(e => e.id === "controlPin").forEach(e => viewer.entities.remove(e));
+
+      // Dibujamos la estaca/pin
+      viewer.entities.add({
+        id: "controlPin",
+        position: pointCartesian,
+        point: { 
+          pixelSize: 18, color: Cesium.Color.RED, 
+          outlineColor: Cesium.Color.WHITE, outlineWidth: 3,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY 
+        },
+        label: { 
+          text: `CONTROL DE CALIDAD\nE: ${targetE}\nN: ${targetN}\nZ: ${targetZ}`, 
+          font: 'bold 12pt sans-serif', fillColor: Cesium.Color.WHITE, 
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE, outlineWidth: 4, 
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM, 
+          pixelOffset: new Cesium.Cartesian2(0, -20),
+          disableDepthTestDistance: Number.POSITIVE_INFINITY 
+        }
+      });
+
+      // Volar hacia el pin
+      viewer.camera.flyTo({
+        destination: pointCartesian,
+        offset: new Cesium.HeadingPitchRange(Cesium.Math.toRadians(0), Cesium.Math.toRadians(-35), 180)
+      });
+    }
+
+    // =========================================================================
+    // 4. GESTOR DE HISTORIAL PERSISTENTE (LOCALSTORAGE)
     // =========================================================================
     const STORAGE_KEY = "SURVEY_MEASUREMENTS_" + ZONA_ACTIVA;
 
@@ -325,14 +412,13 @@
     }
     function clearAllHistory() {
       if (confirm("¿Deseas vaciar todas las mediciones acumuladas de " + activeZone.nombre + "?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        updateHistoryBadge(); clearActiveMeasurement();
+        localStorage.removeItem(STORAGE_KEY); updateHistoryBadge(); clearActiveMeasurement();
       }
     }
     updateHistoryBadge();
 
     // =========================================================================
-    // 4. CONTROLADOR DE CLICS: MEDIR, TALUD Y SECCIÓN
+    // 5. CONTROLADOR DE CLICS: MEDIR, TALUD Y SECCIÓN
     // =========================================================================
     let currentMode = null; let toolPoints = []; let toolEntities = []; let chartInstance = null;
     const toolHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -445,7 +531,6 @@
           slopeBtn.innerText = '📐 Analizar otro'; slopeBtn.classList.remove('active-slope');
         } else if (currentMode === 'section') {
           sectionBtn.innerText = '✂ Procesando...';
-          // Llamar al motor de Raycast
           await generateSectionProfile(p1, p2, distH, deltaZ);
           sectionBtn.innerText = '✂ Otra Sección'; sectionBtn.classList.remove('active-section');
         }
@@ -456,66 +541,47 @@
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     // =========================================================================
-    // 5. MOTOR DE SECCIÓN TRANSVERSAL (NUEVO MÉTODO POR RAYCAST + COORDENADAS)
+    // 6. MOTOR DE SECCIÓN TRANSVERSAL (MUESTREO NATIVO PARA 3D TILES)
     // =========================================================================
     async function generateSectionProfile(p1, p2, totalDistH, totalDeltaZ) {
       const METERS_PER_STEP = 0.5;
       const calculated = Math.round(totalDistH / METERS_PER_STEP);
-      // Limitamos a 300 muestras máximo para no saturar el navegador en tiros larguísimos
-      const NUM_SAMPLES = Math.min(Math.max(calculated, 50), 300); 
+      const NUM_SAMPLES = Math.min(Math.max(calculated, 50), 300);
 
       const c1 = Cesium.Cartographic.fromCartesian(p1);
       const c2 = Cesium.Cartographic.fromCartesian(p2);
       
-      const distancias = [];
-      const elevaciones = [];
-      let distAcum = 0;
-      let prevPtLocal = null;
-
-      // Importante: No queremos que el rayo choque con la línea morada que acabamos de dibujar
-      const objectsToExclude = toolEntities;
-
+      const posicionesCartograficas = [];
       for (let i = 0; i <= NUM_SAMPLES; i++) {
         const t = i / NUM_SAMPLES;
-        
-        // 1. Interpolar lat/lon en el arco geodésico
         const lat = Cesium.Math.lerp(c1.latitude, c2.latitude, t);
         const lon = Cesium.Math.lerp(c1.longitude, c2.longitude, t);
-        
-        // 2. Colocar el origen del rayo en el cielo (500m sobre el punto más alto)
-        const maxElev = Math.max(c1.height, c2.height) + 500.0;
-        const origin = Cesium.Cartesian3.fromRadians(lon, lat, maxElev);
-        
-        // 3. Dirección de caída libre (nadir geodésico hacia el centro de la Tierra)
-        const surfaceNormal = Cesium.Ellipsoid.WGS84.geodeticSurfaceNormal(origin);
-        const direction = Cesium.Cartesian3.negate(surfaceNormal, new Cesium.Cartesian3());
-        
-        const ray = new Cesium.Ray(origin, direction);
-        
-        // 4. Disparar el láser contra la malla del tajo (ignora el aire y baja hasta chocar roca)
-        const hit = viewer.scene.pickFromRay(ray, objectsToExclude);
-        
-        let ptToUse;
-        if (Cesium.defined(hit) && Cesium.defined(hit.position)) {
-           ptToUse = hit.position; // Intersección física perfecta con el banco/berma
-        } else {
-           ptToUse = Cesium.Cartesian3.lerp(p1, p2, t, new Cesium.Cartesian3()); // Fallback si choca en la nada
-        }
+        posicionesCartograficas.push(new Cesium.Cartographic(lon, lat)); 
+      }
 
-        // 5. Convertir a MinePlan
-        const carto = Cesium.Cartographic.fromCartesian(ptToUse);
+      let posicionesConCota;
+      try {
+        posicionesConCota = await viewer.scene.sampleHeightMostDetailed(posicionesCartograficas);
+      } catch (error) {
+        console.warn("Fallo el muestreo de alta resolución.", error);
+        posicionesConCota = posicionesCartograficas;
+      }
+
+      const distancias = []; const elevaciones = []; let distAcum = 0; let prevPtLocal = null;
+
+      for (let i = 0; i < posicionesConCota.length; i++) {
+        const carto = posicionesConCota[i];
+        if (!Cesium.defined(carto.height)) { carto.height = Cesium.Math.lerp(c1.height, c2.height, i / NUM_SAMPLES); }
+
         const local = getMinePlanCoordinates(carto, activeZone);
         const cotaLocal = parseFloat(local.rawZ.toFixed(2));
 
-        // 6. Calcular la distancia progresiva horizontal ESTRICTAMENTE en MinePlan (Pit)
         if (prevPtLocal) {
           const dH = Math.hypot(local.rawE - prevPtLocal.rawE, local.rawN - prevPtLocal.rawN);
           distAcum += dH;
         }
         prevPtLocal = local;
-
-        distancias.push(distAcum.toFixed(1));
-        elevaciones.push(cotaLocal);
+        distancias.push(distAcum.toFixed(1)); elevaciones.push(cotaLocal);
       }
 
       document.getElementById('secLength').innerText = totalDistH.toFixed(1) + ' m';
@@ -529,7 +595,6 @@
       const panel = document.getElementById('panelSection');
       panel.style.display = 'block';
       document.getElementById('coordsCard').style.display = 'none';
-
       if (chartInstance) chartInstance.destroy();
 
       const ctx = document.getElementById('sectionChartCanvas').getContext('2d');
@@ -572,7 +637,7 @@
     }
 
     // =========================================================================
-    // 6. CAPTURA Y EXPORTACIÓN CSV
+    // 7. CAPTURA Y EXPORTACIÓN CSV
     // =========================================================================
     function takeExecutiveScreenshot() {
       viewer.render();
